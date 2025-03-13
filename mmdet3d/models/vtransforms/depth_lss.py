@@ -82,9 +82,11 @@ class DepthLSSTransform(BaseDepthTransform):
     def get_cam_feats(self, x, d):
         B, N, C, fH, fW = x.shape
 
+        # import pdb; pdb.set_trace()
         d = d.view(B * N, *d.shape[2:])
         x = x.view(B * N, C, fH, fW)
 
+        # import pdb; pdb.set_trace()
         d = self.dtransform(d)
         x = torch.cat([d, x], dim=1)
         x = self.depthnet(x)

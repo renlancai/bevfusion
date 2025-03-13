@@ -34,8 +34,8 @@ class BaseTransform(nn.Module):
         dbound: Tuple[float, float, float],
         use_points='lidar', 
         depth_input='scalar',
-        height_expand=True,
-        add_depth_features=True,
+        height_expand=False,
+        add_depth_features=False,
     ) -> None:
         super().__init__()
         self.in_channels = in_channels
@@ -263,6 +263,7 @@ class BaseDepthTransform(BaseTransform):
         camera2lidar_rots = camera2lidar[..., :3, :3]
         camera2lidar_trans = camera2lidar[..., :3, 3]
 
+        # import pdb; pdb.set_trace()
         if self.use_points == 'radar':
             points = radar
 
@@ -274,9 +275,11 @@ class BaseDepthTransform(BaseTransform):
 
         batch_size = len(points)
         depth_in_channels = 1 if self.depth_input=='scalar' else self.D
+
         if self.add_depth_features:
             depth_in_channels += points[0].shape[1]
 
+        # import pdb; pdb.set_trace()
         depth = torch.zeros(batch_size, img.shape[1], depth_in_channels, *self.image_size, device=points[0].device)
 
 
@@ -313,10 +316,11 @@ class BaseDepthTransform(BaseTransform):
                 & (cur_coords[..., 1] < self.image_size[1])
                 & (cur_coords[..., 1] >= 0)
             )
+            # import pdb; pdb.set_trace()
             for c in range(on_img.shape[0]):
                 masked_coords = cur_coords[c, on_img[c]].long()
                 masked_dist = dist[c, on_img[c]]
-
+                # import pdb; pdb.set_trace()
                 if self.depth_input == 'scalar':
                     depth[b, c, 0, masked_coords[:, 0], masked_coords[:, 1]] = masked_dist
                 elif self.depth_input == 'one-hot':
@@ -328,6 +332,7 @@ class BaseDepthTransform(BaseTransform):
                 if self.add_depth_features:
                     depth[b, c, -points[b].shape[-1]:, masked_coords[:, 0], masked_coords[:, 1]] = points[b][boolmask2idx(on_img[c])].transpose(0,1)
 
+        # import pdb; pdb.set_trace()
         extra_rots = lidar_aug_matrix[..., :3, :3]
         extra_trans = lidar_aug_matrix[..., :3, 3]
         geom = self.get_geometry(
@@ -346,6 +351,7 @@ class BaseDepthTransform(BaseTransform):
             'bda_mat': lidar_aug_matrix,
             'sensor2ego_mats': sensor2ego, 
         }
+        # import pdb; pdb.set_trace()
         x = self.get_cam_feats(img, depth, mats_dict)
 
         use_depth = False
