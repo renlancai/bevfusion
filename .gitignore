@@ -136,3 +136,11 @@ runs/*
 # torch hipify generated files
 *_hip.*
 *.hip
+ckpts*
+pretrained*
+run.sh
+1st_run.sh
+eval.sh
+good_seg.sh
+run.sh
+*.bak
