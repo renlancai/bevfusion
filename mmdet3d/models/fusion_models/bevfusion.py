@@ -346,6 +346,7 @@ class BEVFusion(Base3DFusionModel):
                     pred_dict = head(x, metas)
                     losses = head.loss(gt_bboxes_3d, gt_labels_3d, pred_dict)
                 elif type == "map":
+                    # import pdb; pdb.set_trace()
                     losses = head(x, gt_masks_bev)
                 else:
                     raise ValueError(f"unsupported head: {type}")

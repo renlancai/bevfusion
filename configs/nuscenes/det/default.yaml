@@ -1,19 +1,30 @@
 
 image_size: [256, 704]
 
+map_classes:
+  - drivable_area
+  # - drivable_area*
+  - ped_crossing
+  - walkway
+  - stop_line
+  - carpark_area
+  # - road_divider
+  # - lane_divider
+  - divider
+
 model:
   type: BEVFusion
   encoders: null
   fuser: null
   heads:
-    map: null
-      # type: BEVSegmentationHead
-      # in_channels: 256
-      # grid_transform:
-      #   input_scope: [[-51.2, 51.2, 0.8], [-51.2, 51.2, 0.8]]
-      #   output_scope: [[-50, 50, 0.5], [-50, 50, 0.5]]
-      # classes: ${map_classes}
-      # loss: focal
+    map:
+      type: BEVSegmentationHead
+      in_channels: 512
+      grid_transform:
+        input_scope: [[-51.2, 51.2, 0.8], [-51.2, 51.2, 0.8]]
+        output_scope: [[-50, 50, 0.5], [-50, 50, 0.5]]
+      classes: ${map_classes}
+      loss: focal
 
 
 train_pipeline:
@@ -94,6 +105,12 @@ train_pipeline:
     trans_lim: ${augment3d.translate}
     is_train: true
   -
+    type: LoadBEVSegmentation
+    dataset_root: ${dataset_root}
+    xbound: [-50.0, 50.0, 0.5]
+    ybound: [-50.0, 50.0, 0.5]
+    classes: ${map_classes}
+  -
     type: RandomFlip3D
   -
     type: PointsRangeFilter
@@ -131,6 +148,7 @@ train_pipeline:
       - points
       - gt_bboxes_3d
       - gt_labels_3d
+      - gt_masks_bev
     meta_keys:
       - camera_intrinsics
       - camera2ego
@@ -184,6 +202,12 @@ test_pipeline:
     trans_lim: 0.0
     is_train: false
   -
+    type: LoadBEVSegmentation
+    dataset_root: ${dataset_root}
+    xbound: [-50.0, 50.0, 0.5]
+    ybound: [-50.0, 50.0, 0.5]
+    classes: ${map_classes}
+  -
     type: PointsRangeFilter
     point_cloud_range: ${point_cloud_range}
   -
@@ -200,7 +224,7 @@ test_pipeline:
       - points
       - gt_bboxes_3d
       - gt_labels_3d
-      #- gt_masks_bev
+      - gt_masks_bev
     meta_keys:
       - camera_intrinsics
       - camera2ego

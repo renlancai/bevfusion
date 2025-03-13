@@ -100,7 +100,7 @@ class BEVSegmentationHead(nn.Module):
         self.in_channels = in_channels
         self.classes = classes
         self.loss = loss
-
+        # import pdb; pdb.set_trace()
         self.transform = BEVGridTransform(**grid_transform)
         self.classifier = nn.Sequential(
             nn.Conv2d(in_channels, in_channels, 3, padding=1, bias=False),
@@ -119,12 +119,13 @@ class BEVSegmentationHead(nn.Module):
     ) -> Union[torch.Tensor, Dict[str, Any]]:
         if isinstance(x, (list, tuple)):
             x = x[0]
-
+        # import pdb; pdb.set_trace()
         x = self.transform(x)
         x = self.classifier(x)
 
         if self.training:
             losses = {}
+            # import pdb; pdb.set_trace()
             for index, name in enumerate(self.classes):
                 if self.loss == "xent":
                     loss = sigmoid_xent_loss(x[:, index], target[:, index])
