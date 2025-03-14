@@ -219,6 +219,7 @@ class BaseTransform(nn.Module):
             'bda_mat': lidar_aug_matrix,
             'sensor2ego_mats': camera2ego, 
         }
+        # import pdb;pdb.set_trace()
         x = self.get_cam_feats(img, mats_dict)
 
         use_depth = False
@@ -352,7 +353,8 @@ class BaseDepthTransform(BaseTransform):
             'sensor2ego_mats': sensor2ego, 
         }
         # import pdb; pdb.set_trace()
-        x = self.get_cam_feats(img, depth, mats_dict)
+        # x = self.get_cam_feats(img, depth, mats_dict)
+        x = self.get_cam_feats(img, depth)
 
         use_depth = False
         if type(x) == tuple:

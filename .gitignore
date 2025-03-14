@@ -144,3 +144,4 @@ eval.sh
 good_seg.sh
 run.sh
 *.bak
+nohup*
