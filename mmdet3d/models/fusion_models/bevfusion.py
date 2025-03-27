@@ -83,7 +83,7 @@ class BEVFusion(Base3DFusionModel):
         for name in heads:
             if heads[name] is not None:
                 self.heads[name] = build_head(heads[name])
-
+        
         if "loss_scale" in kwargs:
             self.loss_scale = kwargs["loss_scale"]
         else:
@@ -123,14 +123,14 @@ class BEVFusion(Base3DFusionModel):
 
         x = self.encoders["camera"]["backbone"](x)
         x = self.encoders["camera"]["neck"](x)
-
+        
         if not isinstance(x, torch.Tensor):
             x = x[0]
 
         BN, C, H, W = x.size()
         x = x.view(B, int(BN / B), C, H, W)
 
-        x = self.encoders["camera"]["vtransform"](
+        x = self.encoders["camera"]["vtransform"]( # bad
             x,
             points,
             radar_points,
@@ -149,6 +149,7 @@ class BEVFusion(Base3DFusionModel):
         return x
     
     def extract_features(self, x, sensor) -> torch.Tensor:
+        # import pdb; pdb.set_trace()
         feats, coords, sizes = self.voxelize(x, sensor)
         batch_size = coords[-1, 0] + 1
         x = self.encoders[sensor]["backbone"](feats, coords, batch_size, sizes=sizes)
@@ -294,6 +295,7 @@ class BEVFusion(Base3DFusionModel):
     ):
         features = []
         auxiliary_losses = {}
+
         for sensor in (
             self.encoders if self.training else list(self.encoders.keys())[::-1]
         ):
@@ -313,15 +315,16 @@ class BEVFusion(Base3DFusionModel):
                     metas,
                     gt_depths=depths,
                 )
+                # import pdb;pdb.set_trace()
                 if self.use_depth_loss:
                     feature, auxiliary_losses['depth'] = feature[0], feature[-1]
             elif sensor == "lidar":
                 feature = self.extract_features(points, sensor)
+                # import pdb;pdb.set_trace()
             elif sensor == "radar":
                 feature = self.extract_features(radar, sensor)
             else:
                 raise ValueError(f"unsupported sensor: {sensor}")
-
             features.append(feature)
 
         if not self.training:
@@ -342,19 +345,20 @@ class BEVFusion(Base3DFusionModel):
         if self.training:
             outputs = {}
             for type, head in self.heads.items():
+                losses = None
                 if type == "object":
                     pred_dict = head(x, metas)
                     losses = head.loss(gt_bboxes_3d, gt_labels_3d, pred_dict)
                 elif type == "map":
-                    # import pdb; pdb.set_trace()
                     losses = head(x, gt_masks_bev)
                 else:
                     raise ValueError(f"unsupported head: {type}")
-                for name, val in losses.items():
-                    if val.requires_grad:
-                        outputs[f"loss/{type}/{name}"] = val * self.loss_scale[type]
-                    else:
-                        outputs[f"stats/{type}/{name}"] = val
+                if losses is not None:
+                    for name, val in losses.items():
+                        if val.requires_grad:
+                            outputs[f"loss/{type}/{name}"] = val * self.loss_scale[type]
+                        else:
+                            outputs[f"stats/{type}/{name}"] = val
             if self.use_depth_loss:
                 if 'depth' in auxiliary_losses:
                     outputs["loss/depth"] = auxiliary_losses['depth']

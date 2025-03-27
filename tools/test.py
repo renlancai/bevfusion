@@ -11,7 +11,7 @@ from mmcv import Config, DictAction
 from mmcv.cnn import fuse_conv_bn
 from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
 from mmcv.runner import get_dist_info, init_dist, load_checkpoint, wrap_fp16_model
-from mmdet3d.apis import single_gpu_test
+from mmdet3d.apis import single_gpu_test, single_gpu_test_val
 from mmdet3d.datasets import build_dataloader, build_dataset
 from mmdet3d.models import build_model
 from mmdet.apis import multi_gpu_test, set_random_seed
@@ -166,6 +166,7 @@ def main():
         set_random_seed(args.seed, deterministic=args.deterministic)
 
     # build the dataloader
+    # import pdb; pdb.set_trace()
     dataset = build_dataset(cfg.data.test)
     data_loader = build_dataloader(
         dataset,
@@ -191,9 +192,11 @@ def main():
     else:
         model.CLASSES = dataset.CLASSES
 
+    # import pdb;pdb.set_trace()
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
         outputs = single_gpu_test(model, data_loader)
+        # outputs = single_gpu_test_val(model, data_loader)
     else:
         model = MMDistributedDataParallel(
             model.cuda(),

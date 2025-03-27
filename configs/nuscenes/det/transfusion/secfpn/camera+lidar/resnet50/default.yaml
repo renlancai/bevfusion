@@ -1,5 +1,9 @@
+# vtransform_bound: [-50.0, 50.0, 0.5] #default
+vtransform_bound: [-54.0, 54.0, 0.3] # 0.3 = 0.075 * 4
 voxel_size: [0.075, 0.075, 0.2]
 point_cloud_range: [-54.0, -54.0, -5.0, 54.0, 54.0, 3.0]
+
+segmentation_bound: [-50.0, 50.0, 0.2]
 
 model:
   encoders:
@@ -15,8 +19,8 @@ model:
       neck:
         in_channels: [512, 1024, 2048]
       vtransform:
-        xbound: [-54.0, 54.0, 0.3]
-        ybound: [-54.0, 54.0, 0.3]
+        xbound: ${vtransform_bound}
+        ybound: ${vtransform_bound}
     lidar:
       voxelize:
         point_cloud_range: ${point_cloud_range}
@@ -31,6 +35,15 @@ model:
         grid_size: [1440, 1440, 41]
       test_cfg:
         grid_size: [1440, 1440, 41]
+    map: null
+    # map: 
+    #   type: BEVSegmentationHead
+    #   in_channels: 512
+    #   grid_transform:
+    #     input_scope: [[-54.0, 54.0, 0.6], [-54.0, 54.0, 0.6]] # 180 * 180
+    #     output_scope: [[-50, 50, 0.2], [-50, 50, 0.2]]
+    #   classes: ${map_classes}
+    #   loss: focal
 
 lr_config:
   policy: CosineAnnealing

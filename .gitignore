@@ -145,3 +145,5 @@ good_seg.sh
 run.sh
 *.bak
 nohup*
+work_dir*
+*.out*

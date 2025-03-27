@@ -10,6 +10,9 @@ point_cloud_range: [-51.2, -51.2, -5.0, 51.2, 51.2, 3.0]
 voxel_size: [0.1, 0.1, 0.2]
 image_size: [256, 704]
 
+segmentation_bound: [-50.0, 50.0, 0.5]
+vtransform_bound: [-50.0, 50.0, 0.5]
+
 augment2d:
   resize: [[0.38, 0.55], [0.48, 0.48]]
   rotate: [-5.4, 5.4]
@@ -132,8 +135,8 @@ train_pipeline:
   -
     type: LoadBEVSegmentation
     dataset_root: ${dataset_root}
-    xbound: [-50.0, 50.0, 0.5]
-    ybound: [-50.0, 50.0, 0.5]
+    xbound: ${segmentation_bound}
+    ybound: ${segmentation_bound}
     classes: ${map_classes}
   -
     type: RandomFlip3D
@@ -229,8 +232,8 @@ test_pipeline:
   -
     type: LoadBEVSegmentation
     dataset_root: ${dataset_root}
-    xbound: [-50.0, 50.0, 0.5]
-    ybound: [-50.0, 50.0, 0.5]
+    xbound: ${segmentation_bound}
+    ybound: ${segmentation_bound}
     classes: ${map_classes}
   -
     type: PointsRangeFilter
@@ -264,7 +267,7 @@ test_pipeline:
     keyframe_only: true 
 
 data:
-  samples_per_gpu: 1
+  samples_per_gpu: 3
   workers_per_gpu: 1
   train:
     type: CBGSDataset

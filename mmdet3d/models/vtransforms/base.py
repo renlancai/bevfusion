@@ -219,7 +219,7 @@ class BaseTransform(nn.Module):
             'bda_mat': lidar_aug_matrix,
             'sensor2ego_mats': camera2ego, 
         }
-        # import pdb;pdb.set_trace()
+        
         x = self.get_cam_feats(img, mats_dict)
 
         use_depth = False
@@ -264,7 +264,6 @@ class BaseDepthTransform(BaseTransform):
         camera2lidar_rots = camera2lidar[..., :3, :3]
         camera2lidar_trans = camera2lidar[..., :3, 3]
 
-        # import pdb; pdb.set_trace()
         if self.use_points == 'radar':
             points = radar
 
@@ -280,7 +279,6 @@ class BaseDepthTransform(BaseTransform):
         if self.add_depth_features:
             depth_in_channels += points[0].shape[1]
 
-        # import pdb; pdb.set_trace()
         depth = torch.zeros(batch_size, img.shape[1], depth_in_channels, *self.image_size, device=points[0].device)
 
 
@@ -317,7 +315,7 @@ class BaseDepthTransform(BaseTransform):
                 & (cur_coords[..., 1] < self.image_size[1])
                 & (cur_coords[..., 1] >= 0)
             )
-            # import pdb; pdb.set_trace()
+            
             for c in range(on_img.shape[0]):
                 masked_coords = cur_coords[c, on_img[c]].long()
                 masked_dist = dist[c, on_img[c]]
@@ -355,12 +353,12 @@ class BaseDepthTransform(BaseTransform):
         # import pdb; pdb.set_trace()
         # x = self.get_cam_feats(img, depth, mats_dict)
         x = self.get_cam_feats(img, depth)
-
+        
         use_depth = False
         if type(x) == tuple:
             x, depth = x 
             use_depth = True
-        
+
         x = self.bev_pool(geom, x)
 
         if use_depth:

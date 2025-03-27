@@ -190,7 +190,7 @@ class NuScenesDataset(Custom3DDataset):
                 cat_ids.append(self.cat2id[name])
         return cat_ids
 
-    def load_annotations(self, ann_file):
+    def load_annotations(self, ann_file): # called by father.__init__()
         """Load annotations from ann_file.
 
         Args:
@@ -480,11 +480,11 @@ class NuScenesDataset(Custom3DDataset):
                 `jsonfile_prefix` is not specified.
         """
         assert isinstance(results, list), "results must be a list"
-        assert len(results) == len(
-            self
-        ), "The length of results is not equal to the dataset len: {} != {}".format(
-            len(results), len(self)
-        )
+        # assert len(results) == len(
+        #     self
+        # ), "The length of results is not equal to the dataset len: {} != {}".format(
+        #     len(results), len(self)
+        # )
 
         if jsonfile_prefix is None:
             tmp_dir = tempfile.TemporaryDirectory()

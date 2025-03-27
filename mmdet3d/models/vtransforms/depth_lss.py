@@ -35,6 +35,7 @@ class DepthLSSTransform(BaseDepthTransform):
             zbound=zbound,
             dbound=dbound,
         )
+        
         self.dtransform = nn.Sequential(
             nn.Conv2d(1, 8, 1),
             nn.BatchNorm2d(8),
@@ -100,5 +101,6 @@ class DepthLSSTransform(BaseDepthTransform):
 
     def forward(self, *args, **kwargs):
         x = super().forward(*args, **kwargs)
+        # import pdb;pdb.set_trace()
         x = self.downsample(x)
         return x

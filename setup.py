@@ -171,6 +171,11 @@ if __name__ == "__main__":
                 sources=["src/feature_decorator.cpp"],
                 sources_cuda=["src/feature_decorator_cuda.cu"],
             ),
+            # make_cuda_ext(
+            #     name="grid_sample_ext",
+            #     module="mmdet3d.ops.grid_sample",
+            #     sources_cuda=["src/grid_sample.cu"],
+            # ),
         ],
         cmdclass={"build_ext": BuildExtension},
         zip_safe=False,
