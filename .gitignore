@@ -147,3 +147,4 @@ run.sh
 nohup*
 work_dir*
 *.out*
+work_swint_v0p075/*

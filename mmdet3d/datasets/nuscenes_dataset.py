@@ -505,7 +505,7 @@ class NuScenesDataset(Custom3DDataset):
         fp = torch.zeros(num_classes, num_thresholds)
         fn = torch.zeros(num_classes, num_thresholds)
 
-        for result in results:
+        for result in results: # every frame
             pred = result["masks_bev"]
             label = result["gt_masks_bev"]
 

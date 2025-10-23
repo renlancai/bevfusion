@@ -37,16 +37,19 @@ object_classes:
   - pedestrian
   - traffic_cone
 
-map_classes:
-  - drivable_area
-  # - drivable_area*
-  - ped_crossing
-  - walkway
-  - stop_line
-  - carpark_area
-  # - road_divider
-  # - lane_divider
-  - divider
+map_classes: # paper default
+   - drivable_area
+   - ped_crossing
+   - walkway
+   - stop_line
+   - carpark_area
+   - divider
+
+# map_classes: # lets mock Mask2Map
+#   - ped_crossing
+#   - stop_line
+#   - road_divider
+#   - lane_divider
 
 input_modality:
   use_lidar: true
@@ -267,10 +270,10 @@ test_pipeline:
     keyframe_only: true 
 
 data:
-  samples_per_gpu: 3
+  samples_per_gpu: 2
   workers_per_gpu: 1
   train:
-    type: CBGSDataset
+    type: CBGSDataset #use CBGSDataset for training
     dataset:
       type: ${dataset_type}
       dataset_root: ${dataset_root}
